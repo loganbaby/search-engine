@@ -10,6 +10,8 @@ set(CMAKE_CXX_STANDARD 20)
 set(SOURCE_DIR ${CMAKE_SOURCE_DIR}/src)
 set(INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include)
 set(JSON_DIR ${CMAKE_SOURCE_DIR}/json)
+set(RESOURCE_DIR ${CMAKE_SOURCE_DIR}/res)
+
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 
 include(FetchContent)
@@ -28,7 +30,11 @@ add_executable(${PROJECT_NAME}
         ${SOURCE_DIR}/main.cpp
         ${INCLUDE_DIR}/ConverterJSON.h
         ${INCLUDE_DIR}/exceptions.h
-        ${SOURCE_DIR}/ConverterJSON.cpp)
+        ${INCLUDE_DIR}/InvertedIndex.h
+        ${INCLUDE_DIR}/SearchServer.h
+        ${SOURCE_DIR}/InvertedIndex.cpp
+        ${SOURCE_DIR}/ConverterJSON.cpp
+        ${SOURCE_DIR}/SearchServer.cpp)
 
 enable_testing()
 # add_subdirectory(tests)
@@ -36,5 +42,6 @@ enable_testing()
 target_link_libraries(${PROJECT_NAME} PRIVATE nlohmann_json::nlohmann_json)
 
 file(COPY ${JSON_DIR} DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+file(COPY ${RESOURCE_DIR} DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 
 FetchContent_MakeAvailable(json googletest)

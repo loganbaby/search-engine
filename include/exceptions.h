@@ -17,6 +17,11 @@ class FileNotExists : public std::exception {
     inline const char* what() const noexcept override { return "Exception: file not exists"; }
 };
 
+class FileIsEmpty : public std::exception {
+  public:
+    inline const char* what() const noexcept override { return "Exception: file is empty"; }
+};
+
 class AnyFieldMissing : public std::exception {
   public:
     inline const char* what() const noexcept override { return "Exception: any field in config.json [config -> field] is missing"; }
