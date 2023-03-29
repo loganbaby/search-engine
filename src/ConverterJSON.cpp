@@ -99,15 +99,11 @@ void ConverterJSON::putAnswers(std::vector<std::vector<RelativeIndex>> &answers,
             doc.find("answers").value().find(request).value()["relevance"];
             for (auto data: relevanceVector) {
                 limit++;
-                doc.find("answers").value().find(request).value().find("relevance").value()["docid: "
-                                                                                            + std::to_string(
-                        data.doc_id)] = "rank: " + std::to_string(data.rank);
+                doc.find("answers").value().find(request).value().find("relevance").value()["docid: " + std::to_string(data.doc_id)] = "rank: " + std::to_string(data.rank);
             }
             doc.find("answers").value().find(request).value()["result"] = "true";
         } else if (relevanceVector.size() == 1) {
-            doc.find("answers").value().find(request).value()["docid: "
-                                                              + std::to_string(
-                    relevanceVector.back().doc_id)] = "rank: " + std::to_string(relevanceVector.back().rank);
+            doc.find("answers").value().find(request).value()["docid: " + std::to_string(relevanceVector.back().doc_id)] = "rank: " + std::to_string(relevanceVector.back().rank);
             doc.find("answers").value().find(request).value()["result"] = "true";
         } else {
             doc.find("answers").value().find(request).value()["result"] = "false";

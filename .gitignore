@@ -3,4 +3,7 @@ build/
 bin/
 CMakeFiles/
 _deps/
+lib/
+Makefile
+*.cmake
 CMakeCache.txt

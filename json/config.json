@@ -2,10 +2,10 @@
     "config": {
         "name": "search-engine-skillbox",
         "version": "1.0",
-        "max_responses": 2
+        "max_responses": 5
     },
 
     "files": [
-        "res/file.txt"
+        "/home/logbaby/file.txt"
     ]
 }
