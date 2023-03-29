@@ -4,7 +4,6 @@
 
 #include <string>
 #include <vector>
-#include <memory>
 
 struct ConfigData {            // struct of config.json, requests.json   [required]
     std::string name;
@@ -22,15 +21,15 @@ class ConverterJSON {
     std::vector<std::string> GetTextDocuments() const;
 
     /* @return max_responses from config.json */
-    inline int GetResponseLimit() const { return this->config->max_responses; };
+    inline int GetResponseLimit() const { return config.max_responses; };
 
     /* @return list of requests included in requests.json */
-    inline std::vector<std::string> GetRequests() const { return this->config->requests; };
+    inline std::vector<std::string> GetRequests() const { return config.requests; };
 
     void putAnswers(std::vector<std::vector<RelativeIndex>> &answers, const std::string& answersPath) const;
   
   private:
-    std::unique_ptr<ConfigData> config = nullptr;
+    ConfigData config;
 
   protected:
     void setConfigData(const std::string& path);      // read config.json and requests.json into ConfigData

@@ -2,10 +2,11 @@
 #include "InvertedIndex.h"
 #include "gtest/gtest.h"
 
-using namespace std;
+using std::vector;
+using std::string;
 
 void TestInvertedIndexFunctionality(const vector<string>& docs, const vector<string>& requests, const vector<vector<Entry>>& expected) {
-    std::vector<std::vector<Entry>> result;
+    vector<vector<Entry>> result;
     InvertedIndex idx;
     idx.UpdateDocumentBase(docs);
 
@@ -52,8 +53,7 @@ TEST(TestCaseInvertedIndex, TestInvertedIndexMissingWord) {
     };
 
     const vector<string> requests = {"m", "statement"};
-    const vector<vector<Entry>> expected = {
-    {}, {{1, 1}}};
+    const vector<vector<Entry>> expected = {{}, {{1, 1}}};
 
     TestInvertedIndexFunctionality(docs, requests, expected);
 }

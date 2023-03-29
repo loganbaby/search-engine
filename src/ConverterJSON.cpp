@@ -6,7 +6,6 @@
 #include <fstream>
 
 ConverterJSON::ConverterJSON(const std::string configPath, const std::string requestsPath) {
-    this->config = std::make_unique<ConfigData>();
     this->setConfigData(configPath);
 
     std::ifstream inRequests(requestsPath, std::ios::in);
@@ -15,7 +14,7 @@ ConverterJSON::ConverterJSON(const std::string configPath, const std::string req
     inRequests.close();
 
     for (auto const& request : jsonReader["requests"]) {
-        this->config->requests.push_back(request);
+        config.requests.push_back(request);
     }
 }
 
@@ -29,23 +28,23 @@ void ConverterJSON::setConfigData(const std::string& path) {
         if (!jsonReader.contains("config")) throw ConfigFieldMissing();
 
         if (!jsonReader["config"].contains("name") || !jsonReader["config"].contains("max_responses") || !jsonReader["config"].contains("version")) throw AnyFieldMissing();
-        this->config->name = jsonReader["config"]["name"];
-        this->config->max_responses = jsonReader["config"]["max_responses"];
-        this->config->version = jsonReader["config"]["version"];
+        config.name = jsonReader["config"]["name"];
+        config.max_responses = jsonReader["config"]["max_responses"];
+        config.version = jsonReader["config"]["version"];
 
         if (jsonReader.find("files") != jsonReader.end()) {
             for (auto const &file : jsonReader["files"]) {
-                this->config->files.push_back(file);
+                config.files.push_back(file);
             }
         }
 
-        for (auto& file : this->config->files) {
+        for (auto& file : config.files) {
             std::ifstream fileIn(file);
 
             try {
               if (!fileIn.is_open()) throw FileNotExists();
             } catch(FileNotExists x) {
-                std::cerr << x.what() << std::endl;
+                std::cerr << "file in res/: " << x.what() << std::endl;
             }
         }
     } else {
@@ -72,15 +71,13 @@ std::string ConverterJSON::GetDocumentContent(const std::string &path) const {
 
 std::vector<std::string> ConverterJSON::GetTextDocuments() const {
     std::vector<std::string> result;
-    for (const auto &file: this->config->files) {
+    for (const auto &file: config.files) {
         try {
             result.push_back(this->GetDocumentContent((std::string) file));
-        }
-        catch (FileNotExists &x) {
-            std::cout << x.what() << std::endl;
-        }
-        catch (FileIsEmpty x) {
-            std::cout << x.what() << std::endl;
+        } catch (FileNotExists &x) {
+            std::cout << "file in res/: " << x.what() << std::endl;
+        } catch (FileIsEmpty &x) {
+            std::cout << "file in res/: " << x.what() << std::endl;
         }
     }
 

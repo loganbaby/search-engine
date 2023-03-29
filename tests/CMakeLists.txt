@@ -6,13 +6,12 @@ project(${PROJECT_NAME})
 include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR}/src)
 include_directories(../include ${GTEST_INCLUDE_DIRS})
 
-# adding the Google_Tests_run target
 add_executable(${PROJECT_NAME}
         "../src/ConverterJSON.cpp"
         "../src/InvertedIndex.cpp"
         "../src/SearchServer.cpp"
-        "InvertedIndexTest.cpp")
+        "InvertedIndexTest.cpp"
+        "SearchServerTest.cpp")
 
-# linking Google_Tests_run with DateConverter_lib which will be tested
 target_link_libraries(${PROJECT_NAME} nlohmann_json::nlohmann_json)
 target_link_libraries(${PROJECT_NAME} gtest gtest_main)

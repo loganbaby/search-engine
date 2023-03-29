@@ -1,82 +1,52 @@
+#include <vector>
+#include <sstream>
+#include <map>
+#include <string>
+
 #include "SearchServer.h"
-#include <algorithm>
 
-int SearchServer::countWordsInDocument(const std::string &word, int &doc_id) const {
-    int count = 0;
-
-    for (const auto &pair: this->invertedIndex.getDictionary()) {
-        if (pair.first == word) {
-            for (auto const& data: pair.second) {
-                if (data.doc_id == doc_id) count = data.count;
-            }
-        }
-    }
-
-    return count;
-}
-
-std::vector<std::string> SearchServer::getWordsFromDocument(const std::string &str) const {
-    std::vector<std::string> result;
-    std::string eachWord;
-
-    for (auto const &c: str) {
-        if ((c == ' ' || c == '\n') && eachWord.length() != 0) {
-            result.push_back(eachWord);
-            eachWord.clear();
-            continue;
-        }
-        eachWord += (char) tolower(c);
-    }
-    if (eachWord.length() != 0) result.push_back(eachWord);
-    return result;
-}
-
-std::vector<RelativeIndex> SearchServer::getRelativeVector(const std::string &query) const {
-    std::vector<RelativeIndex> indexes;
-
-    int absoluteRelevance[this->invertedIndex.getDocs().size()];
-    float relevance[this->invertedIndex.getDocs().size()];
-
-    for (int i = 0; i < this->invertedIndex.getDocs().size(); i++) {
-        absoluteRelevance[i] = 0;
-        relevance[i] = 0;
-    }
-
-    for (int i = 0; i < this->invertedIndex.getDocs().size(); i++) {
-        for (const auto &word: this->getWordsFromDocument(query)) {
-            absoluteRelevance[i] += this->countWordsInDocument(word, i);
-        }
-    }
-
-    int maxRelevance = absoluteRelevance[0];
-
-    for (const auto &i: absoluteRelevance) if (i >= maxRelevance) maxRelevance = i;
-    if (maxRelevance == 0) return indexes;
-
-    for (int i = 0; i < this->invertedIndex.getDocs().size(); i++) {
-        relevance[i] = (float) absoluteRelevance[i] / (float) maxRelevance;
-        if (relevance[i] > 0) indexes.push_back(RelativeIndex{i, relevance[i]});
-    }
-
-    return indexes;
-}
-
-std::vector<std::vector<RelativeIndex>> SearchServer::search(const std::vector<std::string> &queries_input) const {
+std::vector<std::vector<RelativeIndex>> SearchServer::search(const std::vector<std::string>& queries_input, int responses_limit) const {
     std::vector<std::vector<RelativeIndex>> result;
 
-    result.reserve(queries_input.size());
-    for (auto &query: queries_input) result.push_back(this->getRelativeVector(query));
+    result.resize(queries_input.size());
+    int query_id = 0;
 
-    for (auto &relativeVectors: result) {
-        std::sort(relativeVectors.begin(), relativeVectors.end(), [](RelativeIndex index_1, RelativeIndex index_2) {
-            if (index_1.rank > index_2.rank) return true;
-            if (index_1.rank < index_2.rank) return false;
-            if (index_1.doc_id < index_2.doc_id) return true;
+    for (const auto& query : queries_input) {
+        std::string word;
+        std::map<std::string, std::vector<Entry>> sortedWords;
 
-            return false;
-        });
+        std::stringstream queryContent(query);                  // setting content of query
+        while (queryContent >> word) { sortedWords[word]; }
 
-        while (relativeVectors.size() > this->maxResponses) relativeVectors.pop_back();
+        for (auto& [word, docs_info] : sortedWords) { docs_info = this->invertedIndex.GetWordCount(word); }
+
+        std::map<int, int> sortedDocid;
+        for (const auto& [word, docs_info] : sortedWords) {
+            for (auto doc_info : docs_info) { 
+                sortedDocid[doc_info.doc_id] += doc_info.count; 
+            }
+        }
+
+        if (!sortedDocid.empty()) {
+            std::multimap<int, int> sortedCountofWords;
+
+            for (auto it = rbegin(sortedDocid); it != rend(sortedDocid); ++it) {
+                sortedCountofWords.emplace(it->second, it->first);
+            }
+
+            int max_count = rbegin(sortedCountofWords)->first;
+            RelativeIndex index;
+
+            for (auto it = rbegin(sortedCountofWords); it != rend(sortedCountofWords); ++it) {
+                index.doc_id = it->second;
+                index.rank = (it->first == max_count) ? 1.f : (float)(it->first) / max_count;
+                result[query_id].push_back(index);
+
+                if (--responses_limit == 0) break;           // returned response_limit (save data)
+            }
+        }
+
+        ++query_id;
     }
 
     return result;
