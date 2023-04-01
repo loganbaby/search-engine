@@ -44,7 +44,7 @@ void ConverterJSON::setConfigData(const std::string& path) {
             try {
               if (!fileIn.is_open()) throw FileNotExists();
             } catch(FileNotExists x) {
-                std::cerr << "file in res/: " << x.what() << std::endl;
+                std::cerr << "file " << file << ": " << x.what() << std::endl;
             }
         }
     } else {
@@ -75,9 +75,9 @@ std::vector<std::string> ConverterJSON::GetTextDocuments() const {
         try {
             result.push_back(this->GetDocumentContent((std::string) file));
         } catch (FileNotExists &x) {
-            std::cout << "file in res/: " << x.what() << std::endl;
+            std::cerr << "file " << file << ": " << x.what() << std::endl;
         } catch (FileIsEmpty &x) {
-            std::cout << "file in res/: " << x.what() << std::endl;
+            std::cerr << "file " << file << ": " << x.what() << std::endl;
         }
     }
 
