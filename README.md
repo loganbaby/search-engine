@@ -19,7 +19,7 @@
 ```json
 {
     "config": {
-        "name": "search-engine-skillbox",
+        "name": "search-engine",
         "version": "1.0",
         "max_responses": 5
     },
